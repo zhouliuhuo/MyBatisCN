@@ -105,7 +105,7 @@ public class CacheBuilder {
     public Cache build() {
         // 设置缓存的默认实现、默认装饰器（仅设置，并未装配）
         setDefaultImplementations();
-        // 创建默认的缓存
+        // 创建默认的缓存（自己提供的cache实现类）
         Cache cache = newBaseCacheInstance(implementation, id);
         // 设置缓存的属性
         setCacheProperties(cache);
@@ -153,6 +153,7 @@ public class CacheBuilder {
      * </cache>
      */
     private Cache setStandardDecorators(Cache cache) {
+        // cache标签 里面的属性
         try {
             MetaObject metaCache = SystemMetaObject.forObject(cache);
             // 设置缓存大小
