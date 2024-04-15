@@ -62,6 +62,7 @@ public class JdbcTransaction implements Transaction {
     @Override
     public Connection getConnection() throws SQLException {
         if (connection == null) {
+            // dataSource.getConnection(), 同时设置事务隔离级别和是否自动提交
             openConnection();
         }
         return connection;

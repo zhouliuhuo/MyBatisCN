@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.topevery.facility.core.dao.inspection.InspectionLedgerDao">
+    <!-- 通用查询映射结果 *** 带表名-->
+    <resultMap id="BaseResultMap" type="com.topevery.facility.core.po.inspection.InspectionLedger">
+        <result column="inspection_ledger_inspection_code" property="inspectionCode"/>
+        <result column="inspection_ledger_maintain_dept_id" property="conserveDeptId"/>
+        <result column="inspection_ledger_inspection_frequency_id" property="inspectionFrequencyId"/>
+        <result column="inspection_ledger_maintain_dept_name" property="conserveDeptName"/>
+        <result column="inspection_ledger_inspection_start_time" property="startTime"/>
+        <result column="inspection_ledger_inspection_end_time" property="endTime"/>
+        <result column="inspection_ledger_task_status" property="taskStatus"/>
+        <result column="inspection_ledger_task_completion" property="taskCompletion"/>
+        <result column="inspection_ledger_db_status" property="dbStatus"/>
+        <result column="inspection_ledger_id" property="id"/>
+        <result column="inspection_ledger_create_id" property="createId"/>
+        <result column="inspection_ledger_create_time" property="createTime"/>
+        <result column="inspection_ledger_update_id" property="updateId"/>
+        <result column="inspection_ledger_update_time" property="updateTime"/>
+        <result column="inspection_type" property="inspectionType"/>
+        <result column="que_count" property="queCount"/>
+    </resultMap>
+    <!-- 扩展信息结果映射 *** 带表名 -->
+    <resultMap id="DtoResultMap" type="com.topevery.facility.core.po.inspection.InspectionLedger"
+               extends="BaseResultMap">
+
+    </resultMap>
+    <!-- 通用查询结果列 *** 带表名 -->
+    <sql id="BaseColumnList">
+        inspection_ledger
+        .
+        inspection_code
+        AS inspection_ledger_inspection_code,
+        inspection_ledger.maintain_dept_id AS inspection_ledger_maintain_dept_id,
+        inspection_ledger.inspection_frequency_id AS inspection_ledger_inspection_frequency_id,
+        inspection_ledger.maintain_dept_name AS inspection_ledger_maintain_dept_name,
+        inspection_ledger.inspection_start_time AS inspection_ledger_inspection_start_time,
+        inspection_ledger.inspection_end_time AS inspection_ledger_inspection_end_time,
+        inspection_ledger.problem_num AS inspection_ledger_problem_num,
+        inspection_ledger.task_status AS inspection_ledger_task_status,
+        inspection_ledger.task_completion AS inspection_ledger_task_completion,
+        inspection_ledger.well_num AS inspection_ledger_well_num,
+        inspection_ledger.db_status AS inspection_ledger_db_status,
+        inspection_ledger.id AS inspection_ledger_id,
+        inspection_ledger.create_id AS inspection_ledger_create_id,
+        inspection_ledger.create_time AS inspection_ledger_create_time,
+        inspection_ledger.update_id AS inspection_ledger_update_id,
+        inspection_ledger.update_time AS inspection_ledger_update_time
+    </sql>
+
+
+    <!-- 根据条件获得一个实体 *** 带表名 -->
+    <select id="getOneDTO" resultMap="DtoResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM inspection_ledger
+        <where>
+            <if test="ew != null and ew.sqlSegment != null and ew.sqlSegment !=''">
+                AND ${ew.sqlSegment}
+            </if>
+        </where>
+    </select>
+    <!-- 根据条件获得一个实体列表 *** 带表名 -->
+    <select id="selectDTO" resultMap="DtoResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM inspection_ledger
+        <where>
+            <if test="ew != null and ew.sqlSegment != null and ew.sqlSegment !=''">
+                AND ${ew.sqlSegment}
+            </if>
+        </where>
+    </select>
+    <!-- 根据条件获得一个实体列表***分页 *** 带表名 -->
+    <select id="selectPageDTO" resultMap="DtoResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM inspection_ledger
+        <where>
+            <if test="ew != null and ew.sqlSegment != null and ew.sqlSegment !=''">
+                AND ${ew.sqlSegment}
+            </if>
+        </where>
+    </select>
+
+    <select id="getInspectionMaintenanceStatistics"
+            resultType="com.topevery.facility.core.vo.inspection.InspectionLedgerConserveCountVO">
+        SELECT COUNT(im.facility_id)                                AS manholeCoverNum,
+               IFNULL(SUM(CASE WHEN im.clock_status = 1 THEN 1 ELSE 0 END),0) AS signedInNum,
+               IFNULL(SUM(CASE WHEN im.clock_status = 0 THEN 1 ELSE 0 END),0) AS notSignedInNum,
+               IFNULL((SELECT count(1) FROM um_event e LEFT JOIN inspection_middle im2 ON e.facility_id  = im2.facility_id WHERE im2.task_id = im.task_id),0)                                         AS problemNum
+        FROM inspection_middle im
+                 LEFT JOIN inspection_ledger il ON il.id = im.task_id
+        WHERE im.task_id = #{taskId}
+    </select>
+
+    <select id="getInspectionMaintenancePage"
+            resultType="com.topevery.facility.core.vo.inspection.InspectionLedgerConserveListVO">
+        SELECT
+        im.task_id AS taskId,
+        im.facility_id AS facilityId,
+        IFNULL(im.clock_total, 0) AS clockTotal,
+        IFNULL(il.frequency_value, 0) as frequencyValue,
+        sd.dict_name AS wellClassify,
+        fi.facility_code,
+        CASE
+        WHEN im.clock_status = 0 THEN
+        '未签到'
+        WHEN im.clock_status = 1 THEN
+        '已签到'
+        ELSE ''
+        END AS clockStatus,
+        (SELECT count(1) FROM um_event_task_relation t1 WHERE t1.facility_id=im.facility_id AND t1.task_id=im.task_id) AS problemNum,
+        fi.geo_x,
+        fi.geo_y
+        FROM inspection_middle im
+        LEFT JOIN facility_info fi ON fi.id = im.facility_id
+        LEFT JOIN sys_dictionary sd ON sd.parent_code = 'facility_type' AND fi.facility_type = sd.dict_code
+        LEFT JOIN inspection_ledger il ON il.id = im.task_id
+        where 1=1
+        <if test="query.taskId!=null and query.taskId!=''">
+            and  im.task_id = #{query.taskId}
+        </if>
+        <if test="query.clockStatus != null">
+            and im.clock_status = #{query.clockStatus}
+        </if>
+        <if test="query.facilityId != null">
+            and im.facility_id like CONCAT('%',#{query.facilityId},'%')
+        </if>
+        order by im.update_time desc
+    </select>
+
+    <select id="getInspectionMaintenanceWell"
+            resultType="com.topevery.facility.core.vo.inspection.InspectionLedgerConserveWellVO">
+        SELECT il.inspection_code    AS inspectionCode,
+               fi.id                 AS facilityId,
+               il.conserve_dept_id   AS conserveDeptId,
+               il.conserve_dept_name AS conserveDeptName,
+               il.property_dept_id   AS propertyDeptId,
+               il.task_status        AS taskStatus,
+               il.start_time         AS startTime,
+               il.end_time           AS endTime,
+               il.inspection_type    AS inspectionType,
+               fi.well_level         AS wellLevel,
+               sd.dict_name          AS wellClassify,
+               fi.address            AS address,
+               im.id                 AS middleId,
+               fi.geo_x              AS geoX,
+               fi.geo_y              AS geoY
+        FROM inspection_middle im
+                 LEFT JOIN inspection_ledger il ON il.id = im.task_id
+                 LEFT JOIN facility_info fi ON fi.id = im.facility_id
+                 LEFT JOIN sys_dictionary sd ON sd.parent_code = 'facility_type' AND fi.facility_type = sd.dict_code
+        WHERE im.task_id = #{query.taskId}
+          AND im.facility_id = #{query.facilityId}
+    </select>
+    <select id="getLedgerAndFacilityRelateList"
+            resultType="com.topevery.facility.core.vo.LedgerAndFacilityRelateVO">
+        SELECT
+               im.facility_id        AS facilityId,
+               im.id                 AS inspectionMiddleId,
+               il.id                 AS inspectionLedgerId
+        FROM inspection_middle im
+            LEFT JOIN inspection_ledger il ON il.id = im.task_id
+        WHERE il.task_status = 0
+        AND il.property_dept_id = #{query.propertyDeptId}
+        AND im.facility_id = #{query.facilityId}
+        AND im.clock_status = 0
+    </select>
+    <select id="selectUserById" resultType="java.lang.Long">
+        select default_dept_id from sys_user where id = #{userId}
+    </select>
+    <select id="getTaskCompletionVOByTaskId" resultType="com.topevery.facility.core.vo.TaskCompletionVO">
+        SELECT count(1) AS sumFac   , IFNULL(SUM(clock_total),0) AS clockTotal  FROM inspection_middle im WHERE  im.task_id =  #{taskId}
+    </select>
+
+    <select id="selectListByPropertyDeptId" resultType="com.topevery.facility.core.po.inspection.InspectionLedger">
+        select *
+        from inspection_ledger il
+        where db_status = 1
+        and property_dept_id = #{deptId}
+    </select>
+
+    <select id="getProblemList"
+            resultType="com.topevery.facility.core.vo.inspection.InspectionLedgerEventInformationListVO">
+        SELECT sd.dict_name AS caseSourceName,
+        e.reporter AS reporter,
+        e.tel_phone AS telPhone,
+        fc.NAME AS facilityTypeName,
+        fi.facility_type AS facilityType,
+        fi.id AS facilityId,
+        e.district_name AS districtName,
+        e.district_code AS districtCode,
+        e.street_name AS streetName,
+        e.street_code AS streetCode,
+        e.report_time AS reportTime,
+        e.evt_address AS evtAddress,
+        e.question_desc AS questionDesc,
+        fa.attch_file_path AS attchFilePath,
+        e.id AS evtId,
+        e.case_title AS caseTitle,
+        e.act_def_id AS actDefId,
+        e.act_def_name AS actDefName,
+        e.big_class_id AS bigClassId,
+        e.big_class_name AS bigClassName,
+        e.small_class_id AS smallClassId,
+        e.small_class_name AS smallClassName
+        FROM um_event e
+        LEFT JOIN sys_dictionary sd ON sd.parent_code = 'case_source'
+        AND e.case_source = sd.dict_code
+        LEFT JOIN facility_info fi ON fi.id = e.facility_id
+        AND fi.db_status = '1'
+        LEFT JOIN facility_category fc ON fc.wh_type = fi.facility_type
+        AND fc.db_status = '1'
+        LEFT JOIN facility_attch fa ON fa.facility_id = e.facility_id AND fa.db_status = '1'
+        WHERE e.db_status = '1'
+        <if test="query.facilityId!=null and query.facilityId!=''">
+            AND e.facility_id = #{query.facilityId}
+        </if>
+        <if test="query.evtId!=null and query.evtId!=''">
+            AND e.id = #{query.evtId}
+        </if>
+    </select>
+
+    <select id="getLedgerAndFacilityRelateListOne"
+            resultType="com.topevery.facility.core.vo.LedgerAndFacilityRelateVO">
+        SELECT im.facility_id AS facilityId,
+               im.id          AS inspectionMiddleId,
+               il.id          AS inspectionLedgerId
+        FROM inspection_middle im
+                 LEFT JOIN inspection_ledger il ON il.id = im.task_id AND il.db_status = '1'
+        WHERE il.task_status = 0
+          AND il.start_time &lt;= #{query.reportTime}
+          AND il.end_time &gt;= #{query.reportTime}
+          AND im.facility_id = #{query.facilityId}
+    </select>
+
+</mapper>

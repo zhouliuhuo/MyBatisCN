@@ -116,7 +116,7 @@ public class TransactionalCache implements Cache {
             // 清理缓存
             delegate.clear();
         }
-        // 将为写入缓存的操作写入缓存
+        // 将为写入缓存的数据写入缓存
         flushPendingEntries();
         // 清理环境
         reset();

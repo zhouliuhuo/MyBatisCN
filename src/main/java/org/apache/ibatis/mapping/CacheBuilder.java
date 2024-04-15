@@ -143,6 +143,14 @@ public class CacheBuilder {
      * 为缓存增加标准的装饰器
      * @param cache 被装饰的缓存
      * @return 装饰结束的缓存
+     * <cache type="PERPETUAL"
+     *        eviction="FIFO"
+     *        flushInterval="60000"
+     *        size="512"
+     *        readOnly="true"
+     *        blocking="true"
+     *        properties="" 可以加入property节点，将用来直接修改Cache及装饰器的属性
+     * </cache>
      */
     private Cache setStandardDecorators(Cache cache) {
         try {
