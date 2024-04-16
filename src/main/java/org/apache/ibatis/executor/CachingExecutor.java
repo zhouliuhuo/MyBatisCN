@@ -127,7 +127,7 @@ public class CachingExecutor implements Executor {
                 @SuppressWarnings("unchecked")
                 List<E> list = (List<E>) tcm.getObject(cache, key);
                 if (list == null) { // 缓存中没有结果
-                    // 交给被包装的执行器执行
+                    // 交给被包装的执行器执行（Mapper文件写Cache标签，但是第一次查询，所以缓存中没有数据）
                     list = delegate.query(ms, parameterObject, rowBounds, resultHandler, key, boundSql);
                     // 缓存被包装执行器返回的结果
                     tcm.putObject(cache, key, list); // issue #578 and #116
@@ -135,7 +135,7 @@ public class CachingExecutor implements Executor {
                 return list;
             }
         }
-        // 交由被包装的实际执行器执行
+        // 交由被包装的实际执行器执行（Mapper文件 写没写Cache）
         return delegate.query(ms, parameterObject, rowBounds, resultHandler, key, boundSql);
     }
 
