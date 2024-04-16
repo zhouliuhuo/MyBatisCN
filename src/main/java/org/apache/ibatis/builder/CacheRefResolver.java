@@ -25,9 +25,9 @@ import org.apache.ibatis.cache.Cache;
  * 包含了被解析的对象cacheRefNamespace 和对应的解析器MapperBuilderAssistant 因此具有自解析功能。
  */
 public class CacheRefResolver {
-    // Mapper建造者辅助类
+    // Mapper建造者辅助类(解析器)
     private final MapperBuilderAssistant assistant;
-    // 被应用的namespace，即使用cacheRefNamespace的缓存空间
+    // 被应用的namespace，即使用cacheRefNamespace的缓存空间(被解析对象)
     private final String cacheRefNamespace;
 
     public CacheRefResolver(MapperBuilderAssistant assistant, String cacheRefNamespace) {
