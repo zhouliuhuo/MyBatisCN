@@ -28,7 +28,9 @@ import org.apache.ibatis.session.Configuration;
  */
 
 /*
-
+Discriminator是 resultMap内部的鉴别器，就像程序中的选择语句一样，它使得数据查询结果能够根据某些条件的不同而进行不同的映射
+代码15-9所示的配置使得“id="userMap"”的 resultMap能够根据 sex字段的值进行不同的映射：
+如果sex值为 0，则最终输出结果为 Girl对象，并且根据查询结果设置email属性；如果 sex值为 1，则最终输出结果为 Boy对象，并且根据查询结果设置 age属性
 鉴别器：mybatis可以使用discriminator判断某列的值，然后根据某列的值改变封装行为。
 
 

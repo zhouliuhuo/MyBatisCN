@@ -41,11 +41,11 @@ public class ResultMap {
     private String id;
     // 最终输出结果对应的Java类
     private Class<?> type;
-    // XML中的<result>的列表，即ResultMapping列表
+    // XML中的<result>的列表，即ResultMapping列表(除了两个id标签外的其他标签)
     private List<ResultMapping> resultMappings;
-    // XML中的<id>的列表
+    // XML中的<id>的列表(<id>标签和<idArg>标签)
     private List<ResultMapping> idResultMappings;
-    // XML中的<constructor>中各个属性的列表
+    // XML中的<constructor>中各个属性的列表(<constructor>标签)
     private List<ResultMapping> constructorResultMappings;
     // XML中非<constructor>相关的属性列表
     private List<ResultMapping> propertyResultMappings;

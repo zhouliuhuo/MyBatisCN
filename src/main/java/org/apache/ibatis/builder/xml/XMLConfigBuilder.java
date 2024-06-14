@@ -404,6 +404,8 @@ public class XMLConfigBuilder extends BaseBuilder {
      * 解析mappers节点，例如：
      * <mappers>
      *    <mapper resource="com/github/yeecode/mybatisDemo/UserDao.xml"/>
+     *    <mapper url="file:///var/mappers/PostMapper.xml"/>
+     *    <mapper class="org.mybatis.builder.PostMapper"/>
      *    <package name="com.github.yeecode.mybatisDemo" />
      * </mappers>
      * @param parent mappers节点

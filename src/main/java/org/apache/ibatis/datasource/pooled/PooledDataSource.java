@@ -40,9 +40,10 @@ public class PooledDataSource implements DataSource {
 
     private static final Log log = LogFactory.getLog(PooledDataSource.class);
 
+    // PooledDataSource 没有直接使用列表而是使用 PoolState 对象来存储所有的数据库连接，就是为了统计连接池运行数据的需要
     private final PoolState state = new PoolState(this);
 
-    // 持有一个UnpooledDataSource对象
+    // 持有一个UnpooledDataSource对象，在需要创建新的连接时，由该属性给出
     private final UnpooledDataSource dataSource;
 
     // 和连接池设置有关的配置项

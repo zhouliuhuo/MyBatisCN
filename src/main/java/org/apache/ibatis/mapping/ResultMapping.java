@@ -26,6 +26,7 @@ import org.apache.ibatis.type.TypeHandler;
 import org.apache.ibatis.type.TypeHandlerRegistry;
 
 /**
+ * idArg、arg、id、result等标签都对应一个ResultMapping对象
  * @author Clinton Begin
  */
 public class ResultMapping {
@@ -49,6 +50,9 @@ public class ResultMapping {
     ResultMapping() {
     }
 
+    /**
+     * 内部静态类中方法的调用不需要创建类的对象，而它们却可以生成类的对象
+     */
     public static class Builder {
         private ResultMapping resultMapping = new ResultMapping();
 
