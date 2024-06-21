@@ -35,10 +35,10 @@ import org.apache.ibatis.logging.LogFactory;
 public abstract class VFS {
     private static final Log log = LogFactory.getLog(VFS.class);
 
-    /** The built-in implementations. */
+    /** The built-in implementations. 存储内置的VFS实现类*/
     public static final Class<?>[] IMPLEMENTATIONS = {JBoss6VFS.class, DefaultVFS.class};
 
-    /** The list to which implementations are added by {@link #addImplClass(Class)}. */
+    /** The list to which implementations are added by {@link #addImplClass(Class)}. 存储用户自定义的VFS实现类*/
     public static final List<Class<? extends VFS>> USER_IMPLEMENTATIONS = new ArrayList<>();
 
     /** Singleton instance holder. */

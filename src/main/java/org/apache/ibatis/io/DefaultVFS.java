@@ -36,7 +36,7 @@ import org.apache.ibatis.logging.LogFactory;
 
 /**
  * A default implementation of {@link VFS} that works for most application servers.
- *
+ * 在进行实现类的校验时 DefaultVFS排在整个校验列表的最后。因此，DefaultVFS成了所有 VFS实现类的保底方案，即最后一个验证，但只要验证一定能通过。
  * @author Ben Gunter
  */
 public class DefaultVFS extends VFS {
